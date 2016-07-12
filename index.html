@@ -54,11 +54,11 @@ Please be careful making any decisions based on this report.
       }
     </style>
     <script id='query'>
-
+    
       //list of events to ignore in flow sequences, the below will ignore nothing
       var badEvents = [];
       
-      //can comment or uncomment the line below to ignore all "passive" events
+      //can uncomment the line below to ignore all "passive" events
 
       badEvents = ['$campaign_delivery', '$campaign_marked_spam', '$campaign_bounced', '$campaign_open', '$experiment_started', '$show_survey'];
 
@@ -228,13 +228,10 @@ Please be careful making any decisions based on this report.
 
       function main() {
 
-        //create query to grab events
-        var events = Events({from_date: params.fromDate, to_date: params.toDate});
-        
-        //create query that either joins events to people or just grabs events, depending on whether people data is necessary
+        //create query that either gets only event data or joins, depending on whether people data is necessary
         var query = params.peopleProp?
-                      join(events, People()).filter(item => item.event):
-                      events;
+                      join(Events({from_date: params.fromDate, to_date: params.toDate}), People()).filter(item => item.event):
+                      Events({from_date: params.fromDate, to_date: params.toDate});
 
         //return the query and some transformations
         return query
@@ -258,7 +255,7 @@ Please be careful making any decisions based on this report.
         //clean up the results from above so the result is easier to manipulate
         .map(mapToFinalResult);
       }
-
+      
     </script>
     <div class="mixpanel-platform-section" style='width:919px'>
     <table>
@@ -389,6 +386,7 @@ Please be careful making any decisions based on this report.
       $('.select_button:not(#eventSelect > .select_button, #propSelect > .select_button, #startEventSelect > .select_button, #peoplePropSelect > .select_button)').addClass('small');
       $('.select_menu:not(#eventSelect > .select_menu, #propSelect > .select_menu, #startEventSelect > .select_menu, #peoplePropSelect > .select_menu)').addClass('small');
       $('#numResultsSelect, #minLengthSelect, #timeSelect, #unitSelect, #maxLengthSelect').css({'display': 'inline-block', 'max-width': '50px'})
+
       //grab parameter values from dropdowns
       var params = {
           'fromDate': dateSelect.MPDatepicker('value').from.toISOString().slice(0, -14), //transform the date so it's in YYYY-MM-DD format
